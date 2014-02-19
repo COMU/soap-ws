@@ -25,6 +25,7 @@
     </properties>
 
     <modules>
+        <module>callws</module>
         <module>soap-common</module>
         <module>soap-legacy</module>
         <module>soap-builder</module>
