@@ -1,7 +1,13 @@
 package com.intellica.callws;
 
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import org.apache.commons.cli.*;
 import org.reficio.ws.SoapBuilderException;
+import org.reficio.ws.builder.SoapBuilder;
+import org.reficio.ws.builder.SoapOperation;
 import org.reficio.ws.builder.core.Wsdl;
 
 public class CallWS {
@@ -10,6 +16,7 @@ public class CallWS {
 		Options options = new Options();
 		options.addOption("e", "endpoint", true, "soap endpoint url");
 		options.addOption("c", "check-endpoint", false, "check soap endpoint is accessible and well formed");
+		options.addOption("l", "list-operations", false, "list operations in service");
 		options.addOption("h", "help", false, "print this message");
 
 		CommandLineParser parser = new GnuParser();
@@ -39,7 +46,24 @@ public class CallWS {
 					System.out.println(e.getMessage());
 				}
 			}
-			
+
+			if (cmd.hasOption("list-operations")) {
+				try {
+					Wsdl wsdl = Wsdl.parse(endpoint);
+					List<QName> bindings = wsdl.getBindings();
+
+					for (QName binding : bindings) {
+						SoapBuilder builder = wsdl.getBuilder(binding);
+						for (SoapOperation operation : builder.getOperations()) {
+							System.out.println("Binding name: " + binding.getLocalPart() + ", Operation name: " + operation.getOperationName());
+						}
+					}
+				}
+				catch (SoapBuilderException e) {
+					System.out.println(e.getMessage());
+				}
+			}
+
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
