@@ -31,6 +31,8 @@ import java.util.List;
 public interface SoapBuilder {
 
     List<SoapOperation> getOperations();
+    
+    List<String> getParameters(SoapOperation operation);
 
     SoapOperationFinder operation();
 

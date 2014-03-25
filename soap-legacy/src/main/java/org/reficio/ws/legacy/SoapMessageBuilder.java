@@ -21,6 +21,7 @@ package org.reficio.ws.legacy;
 import com.ibm.wsdl.xml.WSDLReaderImpl;
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.SchemaGlobalElement;
+import org.apache.xmlbeans.SchemaProperty;
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
@@ -444,14 +445,14 @@ class SoapMessageBuilder {
     }
 
     private void createElementForPart(Part part, XmlCursor cursor, SampleXmlUtil xmlGenerator) throws Exception {
-        QName elementName = part.getElementName();
-        QName typeName = part.getTypeName();
+    	QName elementName = part.getElementName();
+    	QName typeName = part.getTypeName();
 
         if (elementName != null) {
             cursor.beginElement(elementName);
 
             if (definitionWrapper.hasSchemaTypes()) {
-                SchemaGlobalElement elm = definitionWrapper.getSchemaTypeLoader().findElement(elementName);
+                SchemaGlobalElement elm = definitionWrapper.getSchemaTypeLoader().findElement(elementName); 
                 if (elm != null) {
                     cursor.toFirstChild();
                     xmlGenerator.createSampleForType(elm.getType(), cursor);
@@ -467,7 +468,6 @@ class SoapMessageBuilder {
             cursor.beginElement(part.getName());
             if (typeName != null && definitionWrapper.hasSchemaTypes()) {
                 SchemaType type = definitionWrapper.getSchemaTypeLoader().findType(typeName);
-
                 if (type != null) {
                     cursor.toFirstChild();
                     xmlGenerator.createSampleForType(type, cursor);
@@ -477,6 +477,41 @@ class SoapMessageBuilder {
 
             cursor.toParent();
         }
+    }
+    
+    public List<String> getParameters(BindingOperation bindingOperation) {
+    	List<String> parameters = new ArrayList<String>();
+    	Part[] inputParts = WsdlUtils.getInputParts(bindingOperation);
+    	for (Part part: inputParts) {
+        	QName elementName = part.getElementName();
+            QName typeName = part.getTypeName();
+
+            if (elementName != null) {
+                if (definitionWrapper.hasSchemaTypes()) {
+                    SchemaGlobalElement elm = definitionWrapper.getSchemaTypeLoader().findElement(elementName);
+                    
+                    if (elm != null) {
+                        SchemaType stype = elm.getType();
+                        SchemaProperty[] attrProps = stype.getElementProperties();
+                        for (int i = 0; i < attrProps.length; i++) {
+                        	SchemaProperty attr = attrProps[i];
+                        	parameters.add(attr.getName().getLocalPart());
+                        }
+                        
+                    } else
+                        log.error("Could not find element [" + elementName + "] specified in part [" + part.getName() + "]");
+                }
+            } else {
+                if (typeName != null && definitionWrapper.hasSchemaTypes()) {
+                    SchemaType type = definitionWrapper.getSchemaTypeLoader().findType(typeName);
+                    if (type != null) {
+                    	parameters.add(type.getName().getLocalPart());
+                    } else
+                        log.error("Could not find type [" + typeName + "] specified in part [" + part.getName() + "]");
+                }
+            }
+    	}
+    	return parameters;
     }
 
     private void buildRpcRequest(BindingOperation bindingOperation, SoapVersion soapVersion, XmlCursor cursor, SampleXmlUtil xmlGenerator)
@@ -497,7 +532,6 @@ class SoapMessageBuilder {
         Part[] inputParts = WsdlUtils.getInputParts(bindingOperation);
         for (int i = 0; i < inputParts.length; i++) {
             Part part = inputParts[i];
-
             if (WsdlUtils.isAttachmentInputPart(part, bindingOperation)) {
                 // TODO - generation of attachment flag could be externalized
                 // if (iface.getSettings().getBoolean(WsdlSettings.ATTACHMENT_PARTS)) {

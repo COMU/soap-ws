@@ -54,6 +54,10 @@ public class SoapLegacyFacade {
             throw new SoapBuilderException(e);
         }
     }
+    
+    public List<String> getParameters(BindingOperation bindingOperation) {
+    	return messageBuilder.getParameters(bindingOperation);
+    }
 
     public String buildSoapMessageFromOutput(Binding binding, BindingOperation bindingOperation, SoapContext context) {
         try {

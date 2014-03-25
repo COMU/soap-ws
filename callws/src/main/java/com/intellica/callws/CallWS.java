@@ -6,6 +6,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.commons.cli.*;
 import org.reficio.ws.SoapBuilderException;
+import org.reficio.ws.SoapContext;
 import org.reficio.ws.builder.SoapBuilder;
 import org.reficio.ws.builder.SoapOperation;
 import org.reficio.ws.builder.core.Wsdl;
@@ -18,6 +19,10 @@ public class CallWS {
 		options.addOption("c", "check-endpoint", false, "check soap endpoint is accessible and well formed");
 		options.addOption("l", "list-operations", false, "list operations in service");
 		options.addOption("h", "help", false, "print this message");
+		options.addOption("b", "binding", true, "binding name");
+		options.addOption("o", "operation", true, "operation name");
+		options.addOption("lp", "list-parameters", false, "list input parameters of operation.");
+		
 
 		CommandLineParser parser = new GnuParser();
 
@@ -63,12 +68,30 @@ public class CallWS {
 					System.out.println(e.getMessage());
 				}
 			}
+			
+			if (cmd.hasOption("list-parameters")) {
+				String binding_name = cmd.getOptionValue("binding");
+				String operation_name = cmd.getOptionValue("operation");
+				
+				if (binding_name == null || operation_name == null) {
+					System.out.println("Binding and operation name required for listing parameters.");
+					System.out.println("Try `callws --help` parameter for more information.");
+					return;
+				}		
+								
+				Wsdl wsdl = Wsdl.parse(endpoint);
+
+				SoapBuilder builder = wsdl.binding().localPart(binding_name).find();
+				
+				SoapOperation operation = builder.operation().name(operation_name).find();
+
+				for (String parameter : builder.getParameters(operation)) {
+					System.out.println(parameter);
+				}
+			}
 
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
-
-
-
 	}
 }

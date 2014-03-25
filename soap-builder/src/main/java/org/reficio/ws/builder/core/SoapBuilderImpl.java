@@ -87,6 +87,11 @@ class SoapBuilderImpl implements SoapBuilder {
     }
 
     @Override
+    public List<String> getParameters(SoapOperation operation) {
+    	return soapFacade.getParameters(getBindingOperation(operation));
+    }
+   
+    @Override
     public SoapContext getContext() {
         return context;
     }
