@@ -10,6 +10,8 @@ import org.reficio.ws.SoapContext;
 import org.reficio.ws.builder.SoapBuilder;
 import org.reficio.ws.builder.SoapOperation;
 import org.reficio.ws.builder.core.Wsdl;
+import org.reficio.ws.client.core.SoapClient;
+import org.reficio.ws.legacy.XmlUtils;
 
 public class CallWS {
 
@@ -22,6 +24,7 @@ public class CallWS {
 		options.addOption("b", "binding", true, "binding name");
 		options.addOption("o", "operation", true, "operation name");
 		options.addOption("lp", "list-parameters", false, "list input parameters of operation.");
+		options.addOption("p", "parameters", true, "input parameters for soap request");
 		
 
 		CommandLineParser parser = new GnuParser();
@@ -88,6 +91,40 @@ public class CallWS {
 				for (String parameter : builder.getParameters(operation)) {
 					System.out.println(parameter);
 				}
+			}
+			
+			if (cmd.hasOption("parameters")) {
+				String binding_name = cmd.getOptionValue("binding");
+				String operation_name = cmd.getOptionValue("operation");
+				
+				if (binding_name == null || operation_name == null) {
+					System.out.println("Binding and operation name required for sending soap request.");
+					System.out.println("Try `callws --help` parameter for more information.");
+					return;
+				}
+				
+				String parameters = cmd.getOptionValue("parameters", "");
+				String[] paramArray = parameters.split(";");
+
+				Wsdl wsdl = Wsdl.parse(endpoint);
+				SoapBuilder builder = wsdl.binding().localPart(binding_name).find();
+				SoapOperation operation = builder.operation().name(operation_name).find();
+			    SoapContext context = SoapContext.builder()
+			    		.alwaysBuildHeaders(true)
+			            .exampleContent(false)
+			            .build();
+			    
+			    String request = builder.buildInputMessage(operation, context);
+			    
+				for (String param : paramArray) {
+					String paramName = param.split(":")[0];
+					String paramValue = param.split(":")[1];
+			    	request = XmlUtils.setXPathContent(request, "//web:" + paramName, paramValue);
+			    }
+			    
+				SoapClient client = SoapClient.builder().endpointUri(endpoint).build();
+				String response = client.post(operation.getSoapAction(), request);
+				System.out.println(response);
 			}
 
 		} catch (ParseException e) {

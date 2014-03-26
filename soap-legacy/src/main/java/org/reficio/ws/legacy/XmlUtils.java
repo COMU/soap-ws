@@ -65,7 +65,7 @@ import java.util.*;
  * General XML-related utilities
  */
 @SuppressWarnings("deprecation")
-final class XmlUtils {
+public final class XmlUtils {
     private static DocumentBuilder documentBuilder;
     private final static Logger log = Logger.getLogger(XmlUtils.class);
 
