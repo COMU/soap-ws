@@ -11,6 +11,7 @@ import org.reficio.ws.builder.SoapBuilder;
 import org.reficio.ws.builder.SoapOperation;
 import org.reficio.ws.builder.core.Wsdl;
 import org.reficio.ws.client.core.SoapClient;
+import org.reficio.ws.common.Parameter;
 import org.reficio.ws.legacy.XmlUtils;
 
 public class CallWS {
@@ -89,8 +90,8 @@ public class CallWS {
 				
 				SoapOperation operation = builder.operation().name(operation_name).find();
 
-				for (String parameter : builder.getParameters(operation)) {
-					System.out.println(parameter);
+				for (Parameter param : builder.getParameters(operation)) {
+					System.out.println("Parameter name: " + param.getName() + ", Parameter type: " + param.getType());
 				}
 			}
 			

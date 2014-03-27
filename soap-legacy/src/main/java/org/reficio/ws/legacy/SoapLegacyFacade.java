@@ -21,11 +21,13 @@ package org.reficio.ws.legacy;
 import org.reficio.ws.SoapBuilderException;
 import org.reficio.ws.SoapContext;
 import org.reficio.ws.SoapValidationException;
+import org.reficio.ws.common.Parameter;
 
 import javax.wsdl.*;
 import javax.wsdl.extensions.soap.SOAPBinding;
 import javax.wsdl.extensions.soap12.SOAP12Binding;
 import javax.xml.namespace.QName;
+
 import java.io.File;
 import java.net.URL;
 import java.util.Collection;
@@ -55,7 +57,7 @@ public class SoapLegacyFacade {
         }
     }
     
-    public List<String> getParameters(BindingOperation bindingOperation) {
+    public List<Parameter> getParameters(BindingOperation bindingOperation) {
     	return messageBuilder.getParameters(bindingOperation);
     }
 

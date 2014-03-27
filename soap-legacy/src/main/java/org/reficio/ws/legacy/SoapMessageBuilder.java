@@ -19,6 +19,7 @@
 package org.reficio.ws.legacy;
 
 import com.ibm.wsdl.xml.WSDLReaderImpl;
+
 import org.apache.log4j.Logger;
 import org.apache.xmlbeans.SchemaGlobalElement;
 import org.apache.xmlbeans.SchemaProperty;
@@ -28,6 +29,7 @@ import org.apache.xmlbeans.XmlObject;
 import org.reficio.ws.SoapBuilderException;
 import org.reficio.ws.SoapContext;
 import org.reficio.ws.annotation.ThreadSafe;
+import org.reficio.ws.common.Parameter;
 import org.reficio.ws.common.Wsdl11Writer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -37,6 +39,7 @@ import javax.wsdl.extensions.soap.SOAPBinding;
 import javax.wsdl.extensions.soap12.SOAP12Binding;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
+
 import java.io.File;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
@@ -447,7 +450,7 @@ class SoapMessageBuilder {
     private void createElementForPart(Part part, XmlCursor cursor, SampleXmlUtil xmlGenerator) throws Exception {
     	QName elementName = part.getElementName();
     	QName typeName = part.getTypeName();
-
+    	
         if (elementName != null) {
             cursor.beginElement(elementName);
 
@@ -479,8 +482,8 @@ class SoapMessageBuilder {
         }
     }
     
-    public List<String> getParameters(BindingOperation bindingOperation) {
-    	List<String> parameters = new ArrayList<String>();
+    public List<Parameter> getParameters(BindingOperation bindingOperation) {
+    	List<Parameter> parameters = new ArrayList<Parameter>();
     	Part[] inputParts = WsdlUtils.getInputParts(bindingOperation);
     	for (Part part: inputParts) {
         	QName elementName = part.getElementName();
@@ -495,9 +498,8 @@ class SoapMessageBuilder {
                         SchemaProperty[] attrProps = stype.getElementProperties();
                         for (int i = 0; i < attrProps.length; i++) {
                         	SchemaProperty attr = attrProps[i];
-                        	parameters.add(attr.getName().getLocalPart());
+                        	parameters.add(new Parameter(attr.getName().getLocalPart(), attr.getType().getName().getLocalPart()));
                         }
-                        
                     } else
                         log.error("Could not find element [" + elementName + "] specified in part [" + part.getName() + "]");
                 }
@@ -505,7 +507,7 @@ class SoapMessageBuilder {
                 if (typeName != null && definitionWrapper.hasSchemaTypes()) {
                     SchemaType type = definitionWrapper.getSchemaTypeLoader().findType(typeName);
                     if (type != null) {
-                    	parameters.add(type.getName().getLocalPart());
+                    	parameters.add(new Parameter("", type.getName().getLocalPart()));
                     } else
                         log.error("Could not find type [" + typeName + "] specified in part [" + part.getName() + "]");
                 }

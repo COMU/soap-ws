@@ -25,6 +25,7 @@ import org.reficio.ws.builder.SoapBuilder;
 import org.reficio.ws.builder.SoapOperation;
 import org.reficio.ws.builder.SoapOperationBuilder;
 import org.reficio.ws.builder.SoapOperationFinder;
+import org.reficio.ws.common.Parameter;
 import org.reficio.ws.legacy.SoapLegacyFacade;
 
 import javax.wsdl.Binding;
@@ -32,6 +33,7 @@ import javax.wsdl.BindingOperation;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
 import javax.xml.namespace.QName;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -87,7 +89,7 @@ class SoapBuilderImpl implements SoapBuilder {
     }
 
     @Override
-    public List<String> getParameters(SoapOperation operation) {
+    public List<Parameter> getParameters(SoapOperation operation) {
     	return soapFacade.getParameters(getBindingOperation(operation));
     }
    

@@ -19,9 +19,11 @@
 package org.reficio.ws.builder;
 
 import org.reficio.ws.SoapContext;
+import org.reficio.ws.common.Parameter;
 
 import javax.wsdl.Binding;
 import javax.xml.namespace.QName;
+
 import java.util.List;
 
 /**
@@ -32,7 +34,7 @@ public interface SoapBuilder {
 
     List<SoapOperation> getOperations();
     
-    List<String> getParameters(SoapOperation operation);
+    List<Parameter> getParameters(SoapOperation operation);
 
     SoapOperationFinder operation();
 
