@@ -12,7 +12,7 @@ import org.reficio.ws.builder.SoapOperation;
 import org.reficio.ws.builder.core.Wsdl;
 import org.reficio.ws.client.core.SoapClient;
 import org.reficio.ws.common.Parameter;
-import org.reficio.ws.legacy.XmlUtils;
+import org.reficio.ws.legacy.SoapMessage;
 
 public class CallWS {
 
@@ -117,12 +117,13 @@ public class CallWS {
 			            .exampleContent(false)
 			            .build();
 			    
-			    String request = builder.buildInputMessage(operation, context);
+			    SoapMessage request = new SoapMessage(builder.buildInputMessage(operation, context));
 			    
 				for (String param : paramArray) {
 					String paramName = param.split(":")[0];
 					String paramValue = param.split(":")[1];
-					request = XmlUtils.setXPathContent(request, "//*:" + paramName, paramValue);
+					
+					request.setParam(paramName, paramValue);
 			    }
 			    
 				String request_url;
@@ -133,7 +134,8 @@ public class CallWS {
 				}
 				
 				SoapClient client = SoapClient.builder().endpointUri(request_url).build();
-				String response = client.post(operation.getSoapAction(), request);
+				String response = client.post(operation.getSoapAction(), request.toString());
+				
 				System.out.println(response);
 			}
 
@@ -142,3 +144,5 @@ public class CallWS {
 		}
 	}
 }
+
+
