@@ -121,7 +121,7 @@ public class CallWS {
 				for (String param : paramArray) {
 					String paramName = param.split(":")[0];
 					String paramValue = param.split(":")[1];
-			    	request = XmlUtils.setXPathContent(request, "//web:" + paramName, paramValue);
+					request = XmlUtils.setXPathContent(request, "//*:" + paramName, paramValue);
 			    }
 			    
 				String request_url;
