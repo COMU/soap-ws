@@ -17,7 +17,8 @@ public class CallWS {
 
 	public static void main(String[] args) {
 		Options options = new Options();
-		options.addOption("e", "endpoint", true, "soap endpoint url");
+		options.addOption("w", "wsdl", true, "soap wsdl url.");
+		options.addOption("e", "endpoint", true, "soap endpoint url.");
 		options.addOption("c", "check-endpoint", false, "check soap endpoint is accessible and well formed");
 		options.addOption("l", "list-operations", false, "list operations in service");
 		options.addOption("h", "help", false, "print this message");
@@ -38,17 +39,17 @@ public class CallWS {
 				return;
 			}
 			
-			if (!cmd.hasOption("endpoint")) {
-				System.out.println("No soap endpoint specified.");
+			if (!cmd.hasOption("wsdl")) {
+				System.out.println("No soap wsdl specified.");
 				System.out.println("Try `callws --help` parameter for more information.");
 				return;
 			}
-			String endpoint = cmd.getOptionValue("endpoint");
+			String wsdl_url = cmd.getOptionValue("wsdl");
 			
 			if (cmd.hasOption("check-endpoint")) {
 				try {
-					Wsdl.parse(endpoint);
-					System.out.println("\"" + endpoint + "\" is accessible and well formed.");
+					Wsdl.parse(wsdl_url);
+					System.out.println("\"" + wsdl_url + "\" is accessible and well formed.");
 				}
 				catch (SoapBuilderException e) {
 					System.out.println(e.getMessage());
@@ -57,7 +58,7 @@ public class CallWS {
 
 			if (cmd.hasOption("list-operations")) {
 				try {
-					Wsdl wsdl = Wsdl.parse(endpoint);
+					Wsdl wsdl = Wsdl.parse(wsdl_url);
 					List<QName> bindings = wsdl.getBindings();
 
 					for (QName binding : bindings) {
@@ -82,7 +83,7 @@ public class CallWS {
 					return;
 				}		
 								
-				Wsdl wsdl = Wsdl.parse(endpoint);
+				Wsdl wsdl = Wsdl.parse(wsdl_url);
 
 				SoapBuilder builder = wsdl.binding().localPart(binding_name).find();
 				
@@ -96,6 +97,7 @@ public class CallWS {
 			if (cmd.hasOption("parameters")) {
 				String binding_name = cmd.getOptionValue("binding");
 				String operation_name = cmd.getOptionValue("operation");
+				String endpoint = cmd.getOptionValue("endpoint");
 				
 				if (binding_name == null || operation_name == null) {
 					System.out.println("Binding and operation name required for sending soap request.");
@@ -106,7 +108,7 @@ public class CallWS {
 				String parameters = cmd.getOptionValue("parameters", "");
 				String[] paramArray = parameters.split(";");
 
-				Wsdl wsdl = Wsdl.parse(endpoint);
+				Wsdl wsdl = Wsdl.parse(wsdl_url);
 				SoapBuilder builder = wsdl.binding().localPart(binding_name).find();
 				SoapOperation operation = builder.operation().name(operation_name).find();
 			    SoapContext context = SoapContext.builder()
@@ -122,7 +124,14 @@ public class CallWS {
 			    	request = XmlUtils.setXPathContent(request, "//web:" + paramName, paramValue);
 			    }
 			    
-				SoapClient client = SoapClient.builder().endpointUri(endpoint).build();
+				String request_url;
+				if (endpoint != null) {
+					request_url = endpoint;
+				} else {
+					request_url = wsdl_url;
+				}
+				
+				SoapClient client = SoapClient.builder().endpointUri(request_url).build();
 				String response = client.post(operation.getSoapAction(), request);
 				System.out.println(response);
 			}
