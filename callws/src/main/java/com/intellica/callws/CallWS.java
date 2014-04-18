@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import net.sf.json.JSONObject;
 import org.apache.commons.cli.*;
 import org.reficio.ws.SoapBuilderException;
 import org.reficio.ws.SoapContext;
@@ -127,7 +128,7 @@ public class CallWS {
 			System.out.println("Try `callws --help` parameter for more information.");
 			return;
 		}
-		String[] paramArray = parameters.split(";");
+		JSONObject jsonObject = JSONObject.fromObject(parameters);
 	
 		Wsdl wsdl = Wsdl.parse(wsdl_url);
 		SoapBuilder builder = wsdl.binding().localPart(binding_name).find();
@@ -139,9 +140,9 @@ public class CallWS {
 	    
 	    SoapMessage request = new SoapMessage(builder.buildInputMessage(operation, context));
 	    
-		for (String param : paramArray) {
-			String paramName = param.split(":")[0];
-			String paramValue = param.split(":")[1];
+		for (Object param : jsonObject.names()) {
+			String paramName = param.toString();
+			String paramValue = jsonObject.getString(param.toString());
 			
 			request.setParam(paramName, paramValue);
 	    }
