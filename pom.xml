@@ -196,49 +196,6 @@
             <!--&lt;!&ndash;</executions>&ndash;&gt;-->
             <!--</plugin>-->
 
-
-            <plugin>
-                <groupId>com.mycila.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
-                <version>1.10.b1</version>
-                <configuration>
-                    <strictCheck>true</strictCheck>
-                    <basedir>${basedir}</basedir>
-                    <header>src/main/resources/license.txt</header>
-                    <quiet>false</quiet>
-                    <failIfMissing>true</failIfMissing>
-                    <aggregate>false</aggregate>
-                    <includes>
-                        <include>src/**</include>
-                        <include>**/test/**</include>
-                    </includes>
-                    <excludes>
-                        <exclude>target/**</exclude>
-                        <exclude>**/resources/**</exclude>
-                        <exclude>.clover/**</exclude>
-                    </excludes>
-                    <useDefaultExcludes>true</useDefaultExcludes>
-                    <mapping>
-                        <jwc>XML_STYLE</jwc>
-                        <application>XML_STYLE</application>
-                        <myFileExtension>JAVADOC_STYLE</myFileExtension>
-                    </mapping>
-                    <useDefaultMapping>true</useDefaultMapping>
-                    <properties>
-                        <year>${project.inceptionYear}-2013</year>
-                        <company>Reficio (TM) - Reestablish your software!</company>
-                    </properties>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -263,19 +220,35 @@
                     </instructions>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                        <!--<phase>compile</phase>-->
-                    </execution>
-                </executions>
-            </plugin>
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-jar-plugin</artifactId>
+    <version>2.4</version>
+      <configuration>
+        <outputDirectory>./target</outputDirectory>
+        <archive>
+          <manifest>
+            <addClasspath>true</addClasspath>
+            <classpathPrefix>lib/</classpathPrefix>
+            <mainClass>com.intellica.callws.CallWS</mainClass>
+          </manifest>
+        </archive>
+     </configuration>
+</plugin>
+      <plugin>
+    <artifactId>maven-dependency-plugin</artifactId>
+    <executions>
+      <execution>
+        <phase>install</phase>
+        <goals>
+          <goal>copy-dependencies</goal>
+        </goals>
+        <configuration>
+          <outputDirectory>./target/lib</outputDirectory>
+        </configuration>
+      </execution>
+    </executions>
+</plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
