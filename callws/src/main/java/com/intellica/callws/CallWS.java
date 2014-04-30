@@ -5,7 +5,11 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import net.sf.json.JSONObject;
+
 import org.apache.commons.cli.*;
+import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlObject;
+import org.apache.xmlbeans.XmlOptions;
 import org.reficio.ws.SoapBuilderException;
 import org.reficio.ws.SoapContext;
 import org.reficio.ws.builder.SoapBuilder;
@@ -23,11 +27,11 @@ public class CallWS {
 		options.addOption("e", "endpoint", true, "soap endpoint url.");
 		options.addOption("c", "check-endpoint", false, "check soap endpoint is accessible and well formed");
 		options.addOption("l", "list-operations", false, "list operations in service");
-		options.addOption("h", "help", false, "print this message");
+		options.addOption("h", "help", false, "prints this message");
 		options.addOption("b", "binding", true, "binding name");
 		options.addOption("o", "operation", true, "operation name");
-		options.addOption("lp", "list-parameters", false, "list input parameters of operation.");
-		options.addOption("p", "parameters", true, "input parameters for soap request");
+		options.addOption("lp", "list-parameters", false, "list input parameters of operation");
+		options.addOption("p", "parameters", true, "input parameters for soap request (json)");
 		
 
 		CommandLineParser parser = new GnuParser();
@@ -156,6 +160,16 @@ public class CallWS {
 		
 		SoapClient client = SoapClient.builder().endpointUri(request_url).build();
 		String response = client.post(operation.getSoapAction(), request.toString());
+		
+		/* pretty print the response */
+		
+		XmlObject xml_response;
+		try {
+			xml_response = XmlObject.Factory.parse(response);
+			response = xml_response.xmlText(new XmlOptions().setSavePrettyPrint().setSavePrettyPrintIndent(2));
+		} catch (XmlException e) {
+			e.printStackTrace();
+		}
 		
 		System.out.println(response);
 	}
