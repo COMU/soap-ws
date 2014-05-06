@@ -14,16 +14,17 @@ soap-ws kütüphanesi ve callws uygulaması bağımlılık yönetimi için [Mave
 Parametreler
 ---------
 
-> usage: callws [-b (arg)] [-c] [-e (arg)] [-h] [-l] [-lp] [-o (arg)] [-p (arg)] [-w (arg)]
->  **-b, --binding (arg)**
->  **-c, --check-endpoint**  
->  **-e, --endpoint (arg) ** 
->  **-h, --help**
->  **-l, --list-operations**
->  **-lp, --list-parameters**
->  **-o, --operation (arg)**
->  **-p, --parameters (arg)** 
->  **-w, --wsdl (arg)**
+<pre> usage: callws [-b <arg>] [-c] [-e <arg>] [-h] [-l] [-lp] [-o <arg>] [-p <arg>] [-w <arg>]
+ -b,--binding <arg>      binding name
+ -c,--check-endpoint     check soap endpoint is accessible and well formed
+ -e,--endpoint <arg>     soap endpoint url.
+ -h,--help               prints this message
+ -l,--list-operations    list operations in service
+ -lp,--list-parameters   list input parameters of operation
+ -o,--operation <arg>    operation name
+ -p,--parameters <arg>   input parameters for soap request (json)
+ -w,--wsdl <arg>         soap wsdl url.
+</pre>
 
 --------
 #### Web servisinin geçerli ve erişilebilir olduğunu kontrol etmek
